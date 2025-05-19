@@ -4,9 +4,9 @@ using TMPro;
 
 public class ClickToAddPoints : MonoBehaviour
 {
-    public int points = 0;              //Total Scores
-    public int pointsPerClick = 1;      // Score per Click
-    public TMP_Text pointsText;             // UI Score Text
+    public int points = 0; //Total Scores
+    public int pointsPerClick = 1; // Score per Click
+    public TMP_Text pointsText; // UI Score Text
 
     void Start()
     {
