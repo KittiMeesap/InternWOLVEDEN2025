@@ -150,6 +150,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buildingPrefab: {fileID: 6722780087331397583, guid: 98a1cdea258348946ba953e31b0705a7, type: 3}
   groundTilemap: {fileID: 943602103}
+  highlightTilemap: {fileID: 0}
+  canPlaceTile: {fileID: 0}
+  cannotPlaceTile: {fileID: 0}
 --- !u!4 &25466091
 Transform:
   m_ObjectHideFlags: 0
@@ -1844,53 +1847,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687996433}
   m_CullTransparentMesh: 1
---- !u!1 &1744649712
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1744649713}
-  - component: {fileID: 1744649714}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1744649713
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1744649712}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 998.58795, y: 629.9371, z: 5.0824623}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1744649714
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1744649712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f91c9fd053277a7419e1cdd542447e3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  points: 0
-  pointsPerClick: 1
-  pointsText: {fileID: 516148107}
 --- !u!1 &1930365636
 GameObject:
   m_ObjectHideFlags: 0
@@ -2402,7 +2358,6 @@ SceneRoots:
   - {fileID: 619394802}
   - {fileID: 274132735}
   - {fileID: 25466091}
-  - {fileID: 1744649713}
   - {fileID: 1970867629}
   - {fileID: 738614144}
   - {fileID: 2092571504}
