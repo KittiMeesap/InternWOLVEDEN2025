@@ -1,29 +1,34 @@
 using TMPro;
 using UnityEngine;
+
 public class PointManager : MonoBehaviour
 {
-    public static PointManager instance{ get; private set; }
-    public int points = 0; // total score     
-    public int pointsPerClick = 1; // score per click
-    public TMP_Text pointsText; // UI score text
+    public static PointManager instance { get; private set; }
+
+    public int points = 0;
+    public int pointsPerClick = 1;
+    public TMP_Text pointsText;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+    }
 
     void Start()
     {
-        instance = this; 
         UpdatePointsText();
     }
 
-    void Update()
+    public void AddPoints(int amount)
     {
-        // left click to add points
-      /*  if (Input.GetMouseButtonDown(0))
-        {
-            AddPoints(pointsPerClick);
-        }*/
-    }
-   public void AddPoints(int pointsAdd)
-    {
-        points += pointsAdd;
+        points += amount;
         UpdatePointsText();
     }
 

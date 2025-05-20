@@ -1,0 +1,25 @@
+using UnityEngine;
+
+public class UpgradePanelManager : MonoBehaviour
+{
+    public GameObject upgradePanel;
+    public GameObject upgradeButton;
+
+    void Start()
+    {
+        upgradePanel.SetActive(false);
+        upgradeButton.SetActive(true);
+    }
+
+    public void OpenUpgradePanel()
+    {
+        upgradePanel.SetActive(true);
+        upgradeButton.SetActive(false);
+    }
+
+    public void CloseUpgradePanel()
+    {
+        upgradePanel.SetActive(false);
+        upgradeButton.SetActive(true);
+    }
+}
