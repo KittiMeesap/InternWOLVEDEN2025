@@ -1,26 +1,42 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 public class BuildManager : MonoBehaviour
 {
-    public GameObject buildingPrefab; 
-    private GameObject currentBuildingInstance; 
-    public Tilemap groundTilemap; 
-    
-    public Tilemap highlightTilemap; 
-    public TileBase canPlaceTile;    
-    public TileBase cannotPlaceTile; 
-    
-    private HashSet<Vector3Int> occupiedCells = new HashSet<Vector3Int>(); 
-    private Vector3Int lastHoveredCell = Vector3Int.one * -1; // ใช้ค่าที่ไม่น่าเป็นไปได้แทน 9999
-    
-    // Cached Camera reference เพื่อลดการเรียก Camera.main บ่อยๆ
-    private Camera mainCamera; 
+
+    public static BuildManager Instance { get; private set; }
+
+
+    private GameObject currentBuildingInstance;
+    public Tilemap groundTilemap;
+
+    public Tilemap highlightTilemap;
+    public TileBase canPlaceTile;
+    public TileBase cannotPlaceTile;
+    public TileBase noBuildZoneTile;
+    public TileBase clickablePointTile;
+
+    public LayerMask clickableGroundLayer;
+
+    private HashSet<Vector3Int> occupiedCells = new HashSet<Vector3Int>();
+    private Vector3Int lastHoveredCell = Vector3Int.one * -1;
+
+    private Camera mainCamera;
+
+    private int currentBuildingCost = 0;
 
     private void Awake()
     {
-        mainCamera = Camera.main; // เก็บ reference ของกล้องหลักเมื่อเริ่มต้น
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        mainCamera = Camera.main;
         if (mainCamera == null)
         {
             Debug.LogError("Main Camera not found! Please ensure your camera is tagged 'MainCamera'.");
@@ -29,94 +45,156 @@ public class BuildManager : MonoBehaviour
 
     private void Update()
     {
-        // ตรวจสอบ Input.GetMouseButtonDown(0) เพียงครั้งเดียว
-        // และ currentBuildingInstance == null เพียงครั้งเดียว
-        bool mouseLeftButtonDown = Input.GetMouseButtonDown(0);
         bool mouseLeftButtonUp = Input.GetMouseButtonUp(0);
-
-        if (mouseLeftButtonDown && currentBuildingInstance == null)
-        {
-            currentBuildingInstance = Instantiate(buildingPrefab); 
-        }
+        bool isPointerOverUI = IsPointerOverUI();
 
         if (currentBuildingInstance != null)
         {
             Vector3 targetPosition = GetTargetPosition();
             currentBuildingInstance.transform.position = targetPosition;
-            
+
             Vector3Int currentCell = groundTilemap.WorldToCell(targetPosition);
-            
-            // Optimize: ตรวจสอบเฉพาะเมื่อ Cell ที่เมาส์อยู่เปลี่ยนไป
+
             if (currentCell != lastHoveredCell)
             {
-                ClearHighlight(); 
+                ClearHighlight();
                 lastHoveredCell = currentCell;
-                HighlightCell(currentCell, IsCellOccupied(currentCell));
+                HighlightCell(currentCell, IsCellOccupiedOrNoBuildZone(currentCell));
             }
-            
-            if (mouseLeftButtonUp)
+
+            if (Input.GetMouseButtonDown(0))
             {
-                PlaceBuilding(targetPosition);
+                if (!isPointerOverUI)
+                {
+                    PlaceBuilding(targetPosition);
+                }
+                else
+                {
+                }
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (PointManager.instance != null && currentBuildingCost > 0)
+                {
+                    PointManager.instance.AddPoints(currentBuildingCost);
+                    currentBuildingCost = 0;
+                }
+                Destroy(currentBuildingInstance);
+                currentBuildingInstance = null;
+                ClearHighlight();
+                lastHoveredCell = Vector3Int.one * -1;
             }
         }
-        else if (lastHoveredCell != Vector3Int.one * -1) // ใช้ค่าที่ไม่น่าเป็นไปได้เดียวกัน
+        else
         {
-            // Optimize: ล้างไฮไลต์เมื่อไม่มีการลากและมีไฮไลต์ค้างอยู่
-            ClearHighlight();
-            lastHoveredCell = Vector3Int.one * -1; 
+            if (Input.GetMouseButtonDown(0) && !isPointerOverUI)
+            {
+                CheckForClickableTileWithRaycast();
+            }
+
+            if (lastHoveredCell != Vector3Int.one * -1)
+            {
+                ClearHighlight();
+                lastHoveredCell = Vector3Int.one * -1;
+            }
         }
+    }
+
+    public bool CanInstantiateBuilding()
+    {
+        return currentBuildingInstance == null;
+    }
+
+    public void InstantiateBuilding(GameObject prefabToInstantiate, int costOfBuilding)
+    {
+        if (currentBuildingInstance == null)
+        {
+            currentBuildingInstance = Instantiate(prefabToInstantiate);
+            currentBuildingCost = costOfBuilding;
+        }
+        else
+        {
+            Debug.LogWarning("Already dragging a building. Cannot instantiate another one.");
+        }
+    }
+
+    private bool IsPointerOverUI()
+    {
+        return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
     }
 
     private Vector3 GetTargetPosition()
     {
-        // ใช้ cached camera
-        Vector3 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition); 
-        mousePos.z = 0f; 
-        Vector3Int currentCell = groundTilemap.WorldToCell(mousePos); 
-        return groundTilemap.GetCellCenterWorld(currentCell); 
+        Vector3 mousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = 0f;
+        Vector3Int currentCell = groundTilemap.WorldToCell(mousePos);
+        return groundTilemap.GetCellCenterWorld(currentCell);
     }
 
     private void PlaceBuilding(Vector3 position)
     {
         Vector3Int cellToPlace = groundTilemap.WorldToCell(position);
 
-        if (!IsCellOccupied(cellToPlace))
+        if (!IsCellOccupiedOrNoBuildZone(cellToPlace))
         {
-            currentBuildingInstance.transform.position = position; 
-            
-            BuildIng buildIngScript = currentBuildingInstance.GetComponent<BuildIng>();
-            if (buildIngScript != null)
+            currentBuildingInstance.transform.position = position;
+
+            BaseBuilding baseBuildingScript = currentBuildingInstance.GetComponent<BaseBuilding>();
+            if (baseBuildingScript != null)
             {
-                buildIngScript.StartBuilding(); 
+                PassivePointBuilding passiveBuilding = baseBuildingScript as PassivePointBuilding;
+                if (passiveBuilding != null)
+                {
+                    passiveBuilding.StartBuilding();
+                }
             }
-            
-            occupiedCells.Add(cellToPlace); 
-            Debug.Log($"Building placed at: {cellToPlace}"); // ใช้ string interpolation
-            ClearHighlight(); 
-            lastHoveredCell = Vector3Int.one * -1; 
-            currentBuildingInstance = null; 
+
+            occupiedCells.Add(cellToPlace);
+            ClearHighlight();
+            lastHoveredCell = Vector3Int.one * -1;
+            currentBuildingInstance = null;
         }
         else
         {
-            Debug.LogWarning($"Cannot place building: Cell {cellToPlace} is already occupied!");
-            // การ Destroy GameObject ที่เพิ่ง Instantiate มาทันทีก็ไม่ใช่ปัญหาประสิทธิภาพใหญ่
-            Destroy(currentBuildingInstance); 
+            if (PointManager.instance != null && currentBuildingCost > 0)
+            {
+                PointManager.instance.AddPoints(currentBuildingCost);
+                currentBuildingCost = 0;
+            }
+            Destroy(currentBuildingInstance);
             currentBuildingInstance = null;
-            ClearHighlight(); 
-            lastHoveredCell = Vector3Int.one * -1; 
+            ClearHighlight();
+            lastHoveredCell = Vector3Int.one * -1;
         }
     }
 
-    private bool IsCellOccupied(Vector3Int cell)
+    private bool IsCellOccupiedOrNoBuildZone(Vector3Int cell)
     {
-        return occupiedCells.Contains(cell);
-    }
+        if (occupiedCells.Contains(cell))
+        {
+            return true;
+        }
 
+        TileBase tileAtCell = groundTilemap.GetTile(cell);
+        if (tileAtCell != null)
+        {
+            if (tileAtCell == noBuildZoneTile)
+            {
+                return true;
+            }
+            if (tileAtCell == clickablePointTile)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     private void HighlightCell(Vector3Int cell, bool isOccupied)
     {
         if (highlightTilemap != null)
         {
-            highlightTilemap.SetTile(cell, isOccupied ? cannotPlaceTile : canPlaceTile); // ใช้ Conditional (Ternary) Operator
+            highlightTilemap.SetTile(cell, isOccupied ? cannotPlaceTile : canPlaceTile);
         }
     }
 
@@ -124,7 +202,31 @@ public class BuildManager : MonoBehaviour
     {
         if (highlightTilemap != null && lastHoveredCell != Vector3Int.one * -1)
         {
-            highlightTilemap.SetTile(lastHoveredCell, null); 
+            highlightTilemap.SetTile(lastHoveredCell, null);
+        }
+    }
+
+    private void CheckForClickableTileWithRaycast()
+    {
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, clickableGroundLayer);
+
+        if (hit.collider != null)
+        {
+            Tilemap hitTilemap = hit.collider.GetComponent<Tilemap>();
+            if (hitTilemap != null && hitTilemap == groundTilemap)
+            {
+                Vector3Int clickedCell = groundTilemap.WorldToCell(hit.point);
+                TileBase tileAtClickedCell = groundTilemap.GetTile(clickedCell);
+                if (tileAtClickedCell != null && tileAtClickedCell == clickablePointTile)
+                {
+                    if (PointManager.instance != null)
+                    {
+                        PointManager.instance.AddPointsForTileClick();
+                    }
+                }
+            }
         }
     }
 }
