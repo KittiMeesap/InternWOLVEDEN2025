@@ -99,6 +99,7 @@ public class BuildManager : MonoBehaviour
                 lastHoveredCell = Vector3Int.one * -1;
             }
         }
+        if (Time.timeScale == 0f) return;
     }
 
     public bool CanInstantiateBuilding()
