@@ -1,79 +1,85 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class UpgradeItem : MonoBehaviour
 {
-    [Header("Upgrade Settings")]
-    public int baseCost = 10;
-    public int basePointsPerSec = 1;
-    public float costMultiplier = 1.5f;
+    [Header("Purchase Settings")]
+    public int purchaseCost = 10;
 
     [Header("UI References")]
     public Button buyButton;
     public TextMeshProUGUI buttonText;
     public TextMeshProUGUI costText;
-    public TextMeshProUGUI pointText;
-    public TextMeshProUGUI nameZoneText;
-    public Image zoneImage;
 
-    [Header("Zone Info")]
-    public string zoneName = "NameZone";
-    public Sprite zoneSprite;
-
-    private int level = 0;
-    private int currentCost;
-    private BuildIng buildIng;
+    [Header("Building to Purchase")]
+    public GameObject buildingPrefabToBuy;
 
     private void Start()
     {
-        currentCost = baseCost;
-
-        buildIng = GetComponent<BuildIng>();
-        if (buildIng == null)
+        if (BuildManager.Instance == null)
         {
-            buildIng = gameObject.AddComponent<BuildIng>();
-            buildIng.pointsPerSec = 0;
-        }
-
-        if (zoneImage != null && zoneSprite != null)
-        {
-            zoneImage.sprite = zoneSprite;
-        }
-
-        if (nameZoneText != null)
-        {
-            nameZoneText.text = zoneName;
+            Debug.LogError("BuildManager.Instance not found in the scene! Ensure BuildManager is present and its Awake() has run.");
+            return;
         }
 
         UpdateUI();
-        buyButton.onClick.AddListener(BuyOrUpgrade);
+        buyButton.onClick.AddListener(AttemptPurchase);
     }
 
     private void Update()
     {
-        buyButton.interactable = PointManager.instance.points >= currentCost;
+        if (PointManager.instance != null && BuildManager.Instance != null)
+        {
+            bool hasEnoughPoints = PointManager.instance.points >= purchaseCost;
+            bool canInstantiate = BuildManager.Instance.CanInstantiateBuilding();
+            buyButton.interactable = hasEnoughPoints && canInstantiate;
+        }
+        else
+        {
+            buyButton.interactable = false;
+        }
     }
 
-    private void BuyOrUpgrade()
+    private void AttemptPurchase()
     {
-        if (PointManager.instance.points < currentCost)
-            return;
-
-        PointManager.instance.AddPoints(-currentCost);
-        level++;
-
-        buildIng.pointsPerSec += basePointsPerSec;
-
-        currentCost = Mathf.RoundToInt(baseCost * Mathf.Pow(costMultiplier, level));
-        UpdateUI();
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            if (PointManager.instance != null && PointManager.instance.points >= purchaseCost)
+            {
+                if (BuildManager.Instance != null && BuildManager.Instance.CanInstantiateBuilding())
+                {
+                    PointManager.instance.AddPoints(-purchaseCost);
+                    if (buildingPrefabToBuy != null)
+                    {
+                        BuildManager.Instance.InstantiateBuilding(buildingPrefabToBuy, purchaseCost);
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        Debug.LogError("Building Prefab To Buy is not assigned in UpgradeItem!");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("BuildManager is not ready or busy. Cannot purchase a new building yet.");
+                }
+            }
+            else
+            {
+                Debug.Log("Not enough points to purchase!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Attempted purchase click not over UI. Blocking.");
+        }
     }
 
     private void UpdateUI()
     {
-        nameZoneText.text = $"{zoneName} Lv.{level}";
-        pointText.text = $"Point+{buildIng.pointsPerSec}";
-        costText.text = $"Point: {currentCost}";
-        buttonText.text = level == 0 ? "Buy" : "Level Up";
+        buttonText.text = "Buy Building";
+        costText.text = $"Cost: {purchaseCost} Points";
     }
 }

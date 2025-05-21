@@ -6,7 +6,12 @@ public class PointManager : MonoBehaviour
     public static PointManager instance { get; private set; }
 
     public int points = 0;
-    public int pointsPerClick = 1;
+
+    [Header("Tile Click Settings")]
+    public int basePointsPerClickOnTile = 1;
+    private int totalBonusPointsFromClickBuildings = 0;
+    public int currentPointsPerClickOnTile => basePointsPerClickOnTile + totalBonusPointsFromClickBuildings;
+
     public TMP_Text pointsText;
 
     private void Awake()
@@ -30,6 +35,23 @@ public class PointManager : MonoBehaviour
     {
         points += amount;
         UpdatePointsText();
+    }
+
+    public void AddPointsForTileClick()
+    {
+        points += currentPointsPerClickOnTile;
+        UpdatePointsText();
+    }
+
+    public void RegisterBonusClickBuilding(int bonusAmount)
+    {
+        totalBonusPointsFromClickBuildings += bonusAmount;
+    }
+
+    public void UnregisterBonusClickBuilding(int bonusAmount)
+    {
+        totalBonusPointsFromClickBuildings -= bonusAmount;
+        if (totalBonusPointsFromClickBuildings < 0) totalBonusPointsFromClickBuildings = 0;
     }
 
     public void UpdatePointsText()
