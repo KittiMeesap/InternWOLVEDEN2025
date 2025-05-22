@@ -1,30 +1,11 @@
 using UnityEngine;
 
-
-// เปลี่ยนไปสืบทอดจาก BaseBuilding
 public class BonusClickBuilding : BaseBuilding 
 {
     [Header("Bonus Click Settings")]
     [SerializeField] private int bonusPointsPerBuilding = 1;
-
-    protected override void Start()
-    {
-        base.Start(); // เรียก Start ของ BaseBuilding
-
-        if (PointManager.instance != null)
-        {
-            PointManager.instance.RegisterBonusClickBuilding(bonusPointsPerBuilding);
-        }
-       
-    }
-
-    private void OnDestroy()
-    {
-        if (PointManager.instance != null)
-        {
-            PointManager.instance.UnregisterBonusClickBuilding(bonusPointsPerBuilding);
-        }
-    }
+    public int BonusPointsPerBuilding => bonusPointsPerBuilding;
+    
 
     public void SetBonusPoints(int newBonus)
     {
@@ -38,5 +19,16 @@ public class BonusClickBuilding : BaseBuilding
             PointManager.instance.RegisterBonusClickBuilding(bonusPointsPerBuilding);
         }
      
+    }
+    public override void StartBuilding()
+    {
+        base.StartBuilding();
+        PointManager.instance.RegisterBonusClickBuilding(bonusPointsPerBuilding);
+            
+    }
+    public override void StopBuilding()
+    {
+        base.StopBuilding(); 
+        PointManager.instance.UnregisterBonusClickBuilding(bonusPointsPerBuilding);
     }
 }

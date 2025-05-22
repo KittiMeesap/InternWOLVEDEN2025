@@ -4,9 +4,10 @@ public class UpgradePanelManager : MonoBehaviour
 {
     public GameObject upgradePanel;
     public GameObject upgradeButton;
-
+    public static UpgradePanelManager instance; 
     void Start()
     {
+        instance = this;
         upgradePanel.SetActive(false);
         upgradeButton.SetActive(true);
     }

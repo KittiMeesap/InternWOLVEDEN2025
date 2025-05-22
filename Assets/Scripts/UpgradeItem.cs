@@ -1,3 +1,4 @@
+  using System.Data.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,35 +6,42 @@ using UnityEngine.EventSystems;
 
 public class UpgradeItem : MonoBehaviour
 {
-    [Header("Purchase Settings")]
-    public int purchaseCost = 10;
 
     [Header("UI References")]
     public Button buyButton;
     public TextMeshProUGUI buttonText;
     public TextMeshProUGUI costText;
-
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI effectText;
+    public Image ImagePerfab;
     [Header("Building to Purchase")]
     public GameObject buildingPrefabToBuy;
 
-    private void Start()
-    {
-        if (BuildManager.Instance == null)
-        {
-            Debug.LogError("BuildManager.Instance not found in the scene! Ensure BuildManager is present and its Awake() has run.");
-            return;
-        }
+    private BaseBuilding buildingInfoFromPrefab;
 
+    private void Awake() 
+    {
+            buildingInfoFromPrefab = buildingPrefabToBuy.GetComponent<BaseBuilding>();
+    }
+
+    private void Start() 
+    {
         UpdateUI();
         buyButton.onClick.AddListener(AttemptPurchase);
     }
 
     private void Update()
     {
-        if (PointManager.instance != null && BuildManager.Instance != null)
+        if (buildingInfoFromPrefab == null)
         {
-            bool hasEnoughPoints = PointManager.instance.points >= purchaseCost;
-            bool canInstantiate = BuildManager.Instance.CanInstantiateBuilding();
+            buyButton.interactable = false;
+            return;
+        }
+        
+        if (PointManager.instance != null && BuildManager.instance != null)
+        {
+            bool hasEnoughPoints = PointManager.instance.points >= buildingInfoFromPrefab.buildingCost;
+            bool canInstantiate = BuildManager.instance.CanInstantiateBuilding();
             buyButton.interactable = hasEnoughPoints && canInstantiate;
         }
         else
@@ -44,42 +52,51 @@ public class UpgradeItem : MonoBehaviour
 
     private void AttemptPurchase()
     {
+        if (buildingInfoFromPrefab == null)
+        {
+            return;
+        }
+        if (BuildManager.instance == null)
+        {
+             return;
+        }
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
-            if (PointManager.instance != null && PointManager.instance.points >= purchaseCost)
+            if (PointManager.instance != null && PointManager.instance.points >= buildingInfoFromPrefab.buildingCost)
             {
-                if (BuildManager.Instance != null && BuildManager.Instance.CanInstantiateBuilding())
+                if (BuildManager.instance.CanInstantiateBuilding())
                 {
-                    PointManager.instance.AddPoints(-purchaseCost);
+                    PointManager.instance.AddPoints(-buildingInfoFromPrefab.buildingCost);
                     if (buildingPrefabToBuy != null)
                     {
-                        BuildManager.Instance.InstantiateBuilding(buildingPrefabToBuy, purchaseCost);
+                        BuildManager.instance.InstantiateBuilding(buildingPrefabToBuy, buildingInfoFromPrefab.buildingCost);
+                        UpgradePanelManager.instance.CloseUpgradePanel();
                         UpdateUI();
                     }
-                    else
-                    {
-                        Debug.LogError("Building Prefab To Buy is not assigned in UpgradeItem!");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("BuildManager is not ready or busy. Cannot purchase a new building yet.");
                 }
             }
-            else
-            {
-                Debug.Log("Not enough points to purchase!");
-            }
         }
-        else
-        {
-            Debug.LogWarning("Attempted purchase click not over UI. Blocking.");
-        }
+       
     }
 
     private void UpdateUI()
     {
-        buttonText.text = "Buy Building";
-        costText.text = $"Cost: {purchaseCost} Points";
+        SpriteRenderer spriteRenderer = buildingPrefabToBuy.GetComponent<SpriteRenderer>();
+        nameText.text = buildingInfoFromPrefab.buildingName;
+        costText.text = $"Cost: {buildingInfoFromPrefab.buildingCost} Points";
+        buttonText.text = $"Buy";
+        ImagePerfab.sprite = spriteRenderer.sprite;
+        switch (buildingInfoFromPrefab) 
+        {
+            case PassivePointBuilding passive: 
+                effectText.text = $"{passive.PointsPerInterval} Pts/sec";
+                break;
+            case BonusClickBuilding bonus: 
+                effectText.text = $"{bonus.BonusPointsPerBuilding} Pts/Click";
+                break;
+            default: 
+                break;
+        }
+        
     }
 }

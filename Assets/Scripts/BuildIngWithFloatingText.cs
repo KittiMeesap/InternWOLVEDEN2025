@@ -2,7 +2,6 @@ using TMPro;
 using UnityEngine;
 using System.Collections;
 
-// คลาสนี้สืบทอดจาก BaseBuilding และเพิ่ม Floating Text เข้ามา
 public abstract class BuildIngWithFloatingText : BaseBuilding
 {
     [Header("Floating Text Animation")]
@@ -16,10 +15,8 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
     protected Transform pointsTextTransform;
     protected Color initialTextColor;
 
-    protected override void Awake() // ใช้ override เพราะ BaseBuilding มี Awake()
+    protected void Awake()
     {
-        base.Awake(); // เรียก Awake ของ BaseBuilding ก่อน
-
         if (pointsText != null)
         {
             pointsTextTransform = pointsText.transform;
@@ -28,17 +25,16 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
             initialTextColor = pointsText.color;
             initialTextColor.a = 1f;
             pointsText.color = initialTextColor;
-
+            
             pointsText.gameObject.SetActive(false);
         }
     }
     
-
-    // Floating Text Logic
     protected IEnumerator FloatAndFadeText(int pointsToShow)
     {
         if (pointsText != null)
         {
+            pointsText.color = initialTextColor;
             pointsText.gameObject.SetActive(true);
             pointsText.text = $"+ {pointsToShow}";
         }
@@ -46,8 +42,8 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
         float currentFloatTime = 0f;
         float floatDurationCalculated = floatOffset.magnitude / floatSpeed;
 
-        Vector3 startLocalPosition = pointsTextTransform.localPosition;
-        Vector3 endLocalPosition = startLocalPosition + floatOffset;
+        Vector3 startLocalPosition = initialTextLocalPosition;
+        Vector3 endLocalPosition = initialTextLocalPosition + floatOffset;
 
         while (currentFloatTime < floatDurationCalculated)
         {
@@ -70,7 +66,7 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
             yield return null;
         }
         pointsText.color = endColor;
-
+        
         pointsTextTransform.localPosition = initialTextLocalPosition;
         pointsText.color = initialTextColor;
 
@@ -82,10 +78,12 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
         }
     }
 
-    // Override StopBuilding เพื่อจัดการ Floating Text
-    public override void StopBuilding()
+    // --- ส่วนที่แก้ไข: Override StopBuilding() เพื่อจัดการ Floating Text ---
+    public override void StopBuilding() // ใช้ override
     {
         base.StopBuilding(); // เรียก StopBuilding ของ BaseBuilding ก่อน
+
+        // Logic เฉพาะของ BuildIngWithFloatingText
         if (currentFloatRoutine != null)
         {
             StopCoroutine(currentFloatRoutine);
@@ -93,6 +91,8 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
         }
         if (pointsText != null)
         {
+            pointsTextTransform.localPosition = initialTextLocalPosition;
+            pointsText.color = initialTextColor;
             pointsText.gameObject.SetActive(false);
         }
     }

@@ -1,47 +1,40 @@
 using UnityEngine;
-// ไม่ต้องใช้ TMPro ที่นี่แล้ว
 
-// เปลี่ยนชื่อคลาสจาก BuildIng เป็น BaseBuilding
 public abstract class BaseBuilding : MonoBehaviour
 {
-    // ลบ [Header("Floating Text Animation")] และตัวแปรทั้งหมดที่เกี่ยวข้องกับ Floating Text ออกไป
-    // (pointsText, floatSpeed, fadeDuration, floatOffset, initialTextLocalPosition,
-    // currentFloatRoutine, pointsTextTransform, initialTextColor)
+    [Header("Building Info")]
+    [SerializeField] public string buildingName = "New Building";
+    [SerializeField] public int buildingCost = 10;
 
     protected bool isBuildingActive = false;
-
-    // ลบ Constructor หากมี (เช่น Awake, Start) ที่เกี่ยวข้องกับ Floating Text
-    protected virtual void Awake()
-    {
-        // ไม่มี logic เกี่ยวกับ Floating Text ที่นี่แล้ว
-    }
-
-    protected virtual void Start()
-    {
-        // ไม่มี logic เกี่ยวกับ Floating Text ที่นี่แล้ว
-    }
-
-    protected virtual void Update()
-    {
-        // คลาสแม่นี้ไม่มี Update loop ที่ทำงานเสมอไป
-    }
 
     public virtual void StartBuilding()
     {
         if (!isBuildingActive)
         {
             isBuildingActive = true;
+            Debug.Log(buildingName + " activated"); // ควรจะเห็น Log นี้ตอนวางสำเร็จ
+            if (SoundManager.instance != null && SoundManager.instance.audioClickBuildings != null)
+            {
+                SoundManager.instance.PlaySound(SoundManager.instance.audioClickBuildings);
+            } else {
+                Debug.LogWarning("SoundManager or audioClickBuildings not found for " + buildingName + " on StartBuilding.");
+            }
         }
     }
 
     public virtual void StopBuilding()
     {
-        if (isBuildingActive)
-        {
+        Debug.Log($"Attempting to Stop Building: {buildingName}. Current isBuildingActive: {isBuildingActive}"); // เพิ่ม Log ตรวจสอบ
             isBuildingActive = false;
-            // ไม่ต้องหยุด Coroutine หรือซ่อน Text แล้ว
-        }
+            Debug.Log(buildingName + " deactivated (Stopping Building)."); // Log เมื่อหยุดสำเร็จ
+            // --- เพิ่มส่วนนี้สำหรับเสียงตอน Stop/Destroy ---
+            if (SoundManager.instance != null && SoundManager.instance.audioDestroyBuildings != null) // สมมติว่ามี audioDestroyBuilding
+            {
+                SoundManager.instance.PlaySound(SoundManager.instance.audioDestroyBuildings);
+            } else {
+                Debug.LogWarning("SoundManager or audioDestroyBuilding not found for " + buildingName + " on StopBuilding.");
+            }
+            // ---------------------------------------------
     }
-
-    // ลบ IEnumerator FloatAndFadeText() ออกไปทั้งหมด
 }
