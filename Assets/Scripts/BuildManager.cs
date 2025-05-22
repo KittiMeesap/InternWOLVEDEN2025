@@ -236,7 +236,7 @@ public class BuildManager : MonoBehaviour
                     if (PointManager.instance != null)
                     {
                         PointManager.instance.AddPointsForTileClick();
-                        SoundManager.instance.PlaySound(SoundManager.instance.audioClickPoints);
+                        SoundManager.instance?.PlayTileClick();
                     }
                 }
             }
