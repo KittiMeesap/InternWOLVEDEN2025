@@ -1,13 +1,27 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpgradePanelManager : MonoBehaviour
 {
     public GameObject upgradePanel;
     public GameObject upgradeButton;
-    public static UpgradePanelManager instance; 
+    public ScrollRect upgradeScrollRect;
+    public static UpgradePanelManager instance;
+
+    private Vector2 savedScrollPosition = Vector2.one;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+    }
+
     void Start()
     {
-        instance = this;
         upgradePanel.SetActive(false);
         upgradeButton.SetActive(true);
     }
@@ -16,10 +30,20 @@ public class UpgradePanelManager : MonoBehaviour
     {
         upgradePanel.SetActive(true);
         upgradeButton.SetActive(false);
+
+        if (upgradeScrollRect != null)
+        {
+            upgradeScrollRect.normalizedPosition = savedScrollPosition;
+        }
     }
 
     public void CloseUpgradePanel()
     {
+        if (upgradeScrollRect != null)
+        {
+            savedScrollPosition = upgradeScrollRect.normalizedPosition;
+        }
+
         upgradePanel.SetActive(false);
         upgradeButton.SetActive(true);
     }
