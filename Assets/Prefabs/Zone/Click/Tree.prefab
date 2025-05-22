@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &672903637100303221
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25,7 +25,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1144527354964945218}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -248,10 +248,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5705040662468442802}
   - component: {fileID: 902843542499447798}
-  - component: {fileID: 4384285928437026847}
-  - component: {fileID: -8123733033766224611}
+  - component: {fileID: -2941590507604134894}
   m_Layer: 0
-  m_Name: BuildTest 1
+  m_Name: Tree
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -317,7 +316,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ad33c9362e783f047846aae14cf76f8f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 418022a056da6ef46b354e79676217a4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -328,7 +327,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4384285928437026847
+--- !u!114 &-2941590507604134894
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -337,25 +336,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8624136093713253310}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef4cc418b07d74f47bb2a18af9818ae8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pointsText: {fileID: 6209931807666657432}
-  floatSpeed: 1
-  fadeDuration: 0.5
-  floatOffset: {x: 0, y: 0.5, z: 0}
-  generateInterval: 3
-  pointsPerInterval: 1
---- !u!114 &-8123733033766224611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8624136093713253310}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 346f0e71a723af24eb4e37cf42dde41a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bonusPointsPerBuilding: 1
+  buildingName: Tree
+  buildingCost: 1000
+  bonusPointsPerBuilding: 5

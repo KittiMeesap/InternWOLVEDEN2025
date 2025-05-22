@@ -5,54 +5,52 @@ using UnityEngine.EventSystems;
 
 public class BuildManager : MonoBehaviour
 {
-
-    public static BuildManager Instance { get; private set; }
-
+    public static BuildManager instance { get; private set; }
 
     private GameObject currentBuildingInstance;
     public Tilemap groundTilemap;
-
     public Tilemap highlightTilemap;
     public TileBase canPlaceTile;
     public TileBase cannotPlaceTile;
     public TileBase noBuildZoneTile;
     public TileBase clickablePointTile;
 
-    public LayerMask clickableGroundLayer;
+    public LayerMask clickableGroundLayer; // <--- ตรวจสอบว่าถูกตั้งค่าใน Inspector!
 
     private HashSet<Vector3Int> occupiedCells = new HashSet<Vector3Int>();
     private Vector3Int lastHoveredCell = Vector3Int.one * -1;
 
-    private Camera mainCamera;
+    private Camera mainCamera; // <--- ตรวจสอบว่ามีค่า ไม่เป็น null
 
     private int currentBuildingCost = 0;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
-        Instance = this;
+        instance = this;
 
         mainCamera = Camera.main;
         if (mainCamera == null)
         {
+            // ถ้าขึ้น Error นี้ แสดงว่ากล้องของคุณไม่ได้ถูก Tag เป็น "MainCamera"
             Debug.LogError("Main Camera not found! Please ensure your camera is tagged 'MainCamera'.");
         }
     }
 
     private void Update()
     {
-        bool mouseLeftButtonUp = Input.GetMouseButtonUp(0);
+        
         bool isPointerOverUI = IsPointerOverUI();
 
         if (currentBuildingInstance != null)
         {
+            
             Vector3 targetPosition = GetTargetPosition();
             currentBuildingInstance.transform.position = targetPosition;
-
             Vector3Int currentCell = groundTilemap.WorldToCell(targetPosition);
 
             if (currentCell != lastHoveredCell)
@@ -68,29 +66,36 @@ public class BuildManager : MonoBehaviour
                 {
                     PlaceBuilding(targetPosition);
                 }
-                else
-                {
-                }
             }
 
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1)) // คลิกขวาเพื่อยกเลิก
             {
+                Debug.Log("Building placement cancelled. Refunding points.");
                 if (PointManager.instance != null && currentBuildingCost > 0)
                 {
                     PointManager.instance.AddPoints(currentBuildingCost);
                     currentBuildingCost = 0;
                 }
+                if (currentBuildingInstance != null)
+                {
+                    BaseBuilding baseBuildingScript = currentBuildingInstance.GetComponent<BaseBuilding>();
+                    if (baseBuildingScript != null)
+                    {
+                        baseBuildingScript.StopBuilding(); // <-- ถูกเรียกครั้งที่ 1
+                    }
+                }
+                UpgradePanelManager.instance.OpenUpgradePanel();
                 Destroy(currentBuildingInstance);
                 currentBuildingInstance = null;
                 ClearHighlight();
                 lastHoveredCell = Vector3Int.one * -1;
             }
         }
-        else
+        else // ไม่มี building กำลังถูกลากอยู่
         {
             if (Input.GetMouseButtonDown(0) && !isPointerOverUI)
             {
-                CheckForClickableTileWithRaycast();
+                CheckForClickableTileWithRaycast(); // <--- โค้ดส่วนนี้
             }
 
             if (lastHoveredCell != Vector3Int.one * -1)
@@ -99,7 +104,6 @@ public class BuildManager : MonoBehaviour
                 lastHoveredCell = Vector3Int.one * -1;
             }
         }
-        if (Time.timeScale == 0f) return;
     }
 
     public bool CanInstantiateBuilding()
@@ -112,6 +116,7 @@ public class BuildManager : MonoBehaviour
         if (currentBuildingInstance == null)
         {
             currentBuildingInstance = Instantiate(prefabToInstantiate);
+            UpgradePanelManager.instance.CloseUpgradePanel();
             currentBuildingCost = costOfBuilding;
         }
         else
@@ -144,11 +149,7 @@ public class BuildManager : MonoBehaviour
             BaseBuilding baseBuildingScript = currentBuildingInstance.GetComponent<BaseBuilding>();
             if (baseBuildingScript != null)
             {
-                PassivePointBuilding passiveBuilding = baseBuildingScript as PassivePointBuilding;
-                if (passiveBuilding != null)
-                {
-                    passiveBuilding.StartBuilding();
-                }
+                baseBuildingScript.StartBuilding();
             }
 
             occupiedCells.Add(cellToPlace);
@@ -163,11 +164,20 @@ public class BuildManager : MonoBehaviour
                 PointManager.instance.AddPoints(currentBuildingCost);
                 currentBuildingCost = 0;
             }
+            if (currentBuildingInstance != null)
+            {
+                BaseBuilding baseBuildingScript = currentBuildingInstance.GetComponent<BaseBuilding>();
+                if (baseBuildingScript != null)
+                {
+                    baseBuildingScript.StopBuilding(); 
+                }
+            }
             Destroy(currentBuildingInstance);
             currentBuildingInstance = null;
             ClearHighlight();
             lastHoveredCell = Vector3Int.one * -1;
         }
+        UpgradePanelManager.instance.OpenUpgradePanel();
     }
 
     private bool IsCellOccupiedOrNoBuildZone(Vector3Int cell)
@@ -210,7 +220,6 @@ public class BuildManager : MonoBehaviour
     private void CheckForClickableTileWithRaycast()
     {
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-
         RaycastHit2D hit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, clickableGroundLayer);
 
         if (hit.collider != null)
@@ -219,15 +228,19 @@ public class BuildManager : MonoBehaviour
             if (hitTilemap != null && hitTilemap == groundTilemap)
             {
                 Vector3Int clickedCell = groundTilemap.WorldToCell(hit.point);
+
                 TileBase tileAtClickedCell = groundTilemap.GetTile(clickedCell);
+
                 if (tileAtClickedCell != null && tileAtClickedCell == clickablePointTile)
                 {
                     if (PointManager.instance != null)
                     {
                         PointManager.instance.AddPointsForTileClick();
+                        SoundManager.instance.PlaySound(SoundManager.instance.audioClickPoints);
                     }
                 }
             }
         }
+       
     }
 }
