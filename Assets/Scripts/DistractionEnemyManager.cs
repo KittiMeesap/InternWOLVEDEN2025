@@ -20,7 +20,6 @@ public class DistractionEnemyManager : MonoBehaviour
             DistractionEnemy enemy = obj.GetComponent<DistractionEnemy>();
             enemyPool.Add(enemy);
         }
-
         startTime = Time.time;
     }
 
