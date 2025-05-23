@@ -6,19 +6,18 @@ public class SoundManager : MonoBehaviour
     public static SoundManager instance;
 
     [Header("Audio Sources")]
-    public AudioSource menuSource;
-    public AudioSource gameSource;
+    public AudioSource audioSource; 
 
     [Header("Menu Clips")]
-    public AudioClip menuClick;
-    public AudioClip menuHover;
-    public AudioClip menuBGM;
+    public AudioClip  soundMenuClick;
+    public AudioClip  soundMenuHover;
+    public AudioClip  soundMenuBGM;
 
     [Header("Gameplay Clips")]
-    public AudioClip buildingClick;
-    public AudioClip tileClick;
-    public AudioClip destroyBuilding;
-    public AudioClip gameBGM;
+    public AudioClip soundBuildingClick; 
+    public AudioClip soundTileClickPoint;
+    public AudioClip soundDestroyBuilding;
+    public AudioClip  soundGameBGM;
 
     void Awake()
     {
@@ -28,7 +27,15 @@ public class SoundManager : MonoBehaviour
             return;
         }
         instance = this;
-        DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject); 
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                Debug.LogError("SoundManager requires an AudioSource component on the same GameObject!");
+            }
+        }
     }
 
     void OnEnable()
@@ -39,6 +46,32 @@ public class SoundManager : MonoBehaviour
     void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+    
+    public void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
+        else
+        {
+            Debug.LogWarning("SoundManager: Tried to play a null clip or audioSource is null.");
+        }
+    }
+    
+    private void PlayBGM(AudioClip newBGM)
+    {
+        if (audioSource == null) return;
+
+        // ถ้า BGM ปัจจุบันไม่ใช่ BGM ใหม่ หรือไม่ได้กำลังเล่นอยู่
+        if (audioSource.clip != newBGM || !audioSource.isPlaying)
+        {
+            audioSource.Stop();
+            audioSource.clip = newBGM;
+            audioSource.loop = true; // BGM ควรอ่านซ้ำ
+            audioSource.Play();
+        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -51,46 +84,17 @@ public class SoundManager : MonoBehaviour
         {
             PlayGameBGM();
         }
+        // หากมี Scene อื่นๆ สามารถเพิ่ม else if ได้
     }
 
-    // === Menu ===
-    public void PlayMenuHover() => menuSource?.PlayOneShot(menuHover);
-    public void PlayMenuClick() => menuSource?.PlayOneShot(menuClick);
-
+    // === Menu BGM ===
     public void PlayMenuBGM()
     {
-        if (menuSource != null && menuSource.clip != menuBGM)
-        {
-            menuSource.Stop();
-            menuSource.clip = menuBGM;
-            menuSource.loop = true;
-            menuSource.Play();
-        }
-
-        if (gameSource != null && gameSource.isPlaying)
-        {
-            gameSource.Stop();
-        }
+        PlayBGM(soundMenuBGM);
     }
-
-    // === Gameplay ===
-    public void PlayBuildingClick() => gameSource?.PlayOneShot(buildingClick);
-    public void PlayTileClick() => gameSource?.PlayOneShot(tileClick);
-    public void PlayDestroyBuilding() => gameSource?.PlayOneShot(destroyBuilding);
-
+    
     public void PlayGameBGM()
     {
-        if (gameSource != null && gameSource.clip != gameBGM)
-        {
-            gameSource.Stop();
-            gameSource.clip = gameBGM;
-            gameSource.loop = true;
-            gameSource.Play();
-        }
-
-        if (menuSource != null && menuSource.isPlaying)
-        {
-            menuSource.Stop();
-        }
+        PlayBGM(soundGameBGM);
     }
 }

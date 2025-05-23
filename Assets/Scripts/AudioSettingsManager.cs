@@ -17,8 +17,7 @@ public class AudioSettingsManager : MonoBehaviour
         {
             sourcesToControl = new AudioSource[]
             {
-                SoundManager.instance.gameSource,
-                SoundManager.instance.menuSource
+                SoundManager.instance.audioSource
             };
         }
 

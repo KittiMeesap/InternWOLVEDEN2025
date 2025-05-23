@@ -77,13 +77,10 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
             pointsText.gameObject.SetActive(false);
         }
     }
-
-    // --- ส่วนที่แก้ไข: Override StopBuilding() เพื่อจัดการ Floating Text ---
-    public override void StopBuilding() // ใช้ override
+    
+    public override void StopBuilding() 
     {
-        base.StopBuilding(); // เรียก StopBuilding ของ BaseBuilding ก่อน
-
-        // Logic เฉพาะของ BuildIngWithFloatingText
+        base.StopBuilding(); 
         if (currentFloatRoutine != null)
         {
             StopCoroutine(currentFloatRoutine);

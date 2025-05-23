@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e2b206134b4449048a31417077fe8abd
+guid: 49456365b9684404e962b8bf1773ae54
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6840181371970676099
-    second: 20-greenlands_swamp_0
+      213: -4011212048521297107
+    second: CannotBuild_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 20-greenlands_swamp_0
+      name: CannotBuild_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3856e8b87b43dee50800000000000000
-      internalID: 6840181371970676099
+      spriteID: d230f19e4ef4558c0800000000000000
+      internalID: -4011212048521297107
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      20-greenlands_swamp_0: 6840181371970676099
+      CannotBuild_0: -4011212048521297107
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

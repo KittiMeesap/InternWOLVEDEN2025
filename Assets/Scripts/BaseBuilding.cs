@@ -13,17 +13,14 @@ public abstract class BaseBuilding : MonoBehaviour
         if (!isBuildingActive)
         {
             isBuildingActive = true;
-            Debug.Log(buildingName + " activated");
-            SoundManager.instance?.PlayBuildingClick();
+            SoundManager.instance?.PlaySound(SoundManager.instance.soundBuildingClick);
         }
     }
 
     public virtual void StopBuilding()
     {
         isBuildingActive = false;
-        Debug.Log(buildingName + " deactivated");
-
-        SoundManager.instance?.PlayDestroyBuilding();
+        SoundManager.instance?.PlaySound(SoundManager.instance.soundDestroyBuilding);
     }
 
 }
