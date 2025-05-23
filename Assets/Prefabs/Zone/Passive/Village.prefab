@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 902843542499447798}
   - component: {fileID: 4384285928437026847}
   m_Layer: 0
-  m_Name: Volcano
+  m_Name: Village
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -329,7 +329,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ad33c9362e783f047846aae14cf76f8f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4bcc166656f499e4e9fc205923d32fa5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -352,10 +352,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef4cc418b07d74f47bb2a18af9818ae8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buildingName: Volcano
-  buildingCost: 300
+  buildingName: Village
+  buildingCost: 350
   pointsText: {fileID: 6209931807666657432}
   floatSpeed: 1
   fadeDuration: 0.5
   floatOffset: {x: 0, y: 0.5, z: 0}
-  pointsPerInterval: 15
+  pointsPerInterval: 20
