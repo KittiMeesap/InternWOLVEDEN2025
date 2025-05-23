@@ -10,7 +10,7 @@ public class UnlockBlackGrindBuilding : BaseBuilding
         Vector3Int cellToUnlock = BuildManager.instance.groundTilemap.WorldToCell(transform.position);
         if (BuildManager.instance != null)
         {
-            BuildManager.instance.UnlockTile(cellToUnlock); // <-- เรียก UnlockTile() เพื่อลบ blackGrindTilebase ออกจาก Ground Tilemap
+            BuildManager.instance.UnlockTile(cellToUnlock); 
         }
     }
 

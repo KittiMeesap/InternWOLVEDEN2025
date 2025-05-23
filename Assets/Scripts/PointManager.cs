@@ -32,6 +32,7 @@ public class PointManager : MonoBehaviour
             return;
         }
         instance = this;
+        
     }
 
     void Start()
@@ -68,7 +69,7 @@ public class PointManager : MonoBehaviour
     public void AddPointsForTileClick()
     {
         AddPoints(currentPointsPerClickOnTile);
-        
+    
     }
 
     public void RegisterBonusClickBuilding(int bonusAmount)
@@ -121,4 +122,5 @@ public class PointManager : MonoBehaviour
     {
         pointPerClickText.text = pointsPerClick.ToString()+ "Pts/Click";
     }
+   
 }
