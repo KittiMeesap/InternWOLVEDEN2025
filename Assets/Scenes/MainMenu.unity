@@ -210,9 +210,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   volumeSlider: {fileID: 1558027536}
-  sourcesToControl:
-  - {fileID: 1348376072}
-  - {fileID: 1330343093}
 --- !u!1 &270587614
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,8 +529,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9797b080bcb0288489a6ef886d5b324e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 8300000, guid: dbde4eb0615d0dc4eac4c9c521c6fc8b, type: 3}
 --- !u!82 &390868943
 AudioSource:
   m_ObjectHideFlags: 0
@@ -757,6 +752,7 @@ GameObject:
   - component: {fileID: 1165117811}
   - component: {fileID: 1165117810}
   - component: {fileID: 1165117809}
+  - component: {fileID: 1165117812}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -838,6 +834,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1165117812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1165117808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &1247618237
 GameObject:
   m_ObjectHideFlags: 0
@@ -1930,15 +1970,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9505e727747d1454ba68baf14b314246, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  menuSource: {fileID: 1348376072}
-  gameSource: {fileID: 1330343093}
-  menuClick: {fileID: 8300000, guid: dbde4eb0615d0dc4eac4c9c521c6fc8b, type: 3}
-  menuHover: {fileID: 8300000, guid: ce13695a5611c8c428fccae954f1835a, type: 3}
-  menuBGM: {fileID: 8300000, guid: 90e71ae17122d864285fd55773d7e34a, type: 3}
-  buildingClick: {fileID: 8300000, guid: ce13695a5611c8c428fccae954f1835a, type: 3}
-  tileClick: {fileID: 8300000, guid: ce13695a5611c8c428fccae954f1835a, type: 3}
-  destroyBuilding: {fileID: 8300000, guid: dbde4eb0615d0dc4eac4c9c521c6fc8b, type: 3}
-  gameBGM: {fileID: 8300000, guid: 6e1c95b9af24d194e8fd58d031fed792, type: 3}
+  audioSource: {fileID: 1583568998}
+  soundMenuClick: {fileID: 8300000, guid: 70f7b8f0efa62204493d81b8e8b25629, type: 3}
+  soundMenuHover: {fileID: 8300000, guid: 70f7b8f0efa62204493d81b8e8b25629, type: 3}
+  soundMenuBGM: {fileID: 8300000, guid: 90e71ae17122d864285fd55773d7e34a, type: 3}
+  soundBuildingClick: {fileID: 8300000, guid: a323619caff43bf44aa685cd5deea05e, type: 3}
+  soundTileClickPoint: {fileID: 8300000, guid: ce13695a5611c8c428fccae954f1835a, type: 3}
+  soundDestroyBuilding: {fileID: 8300000, guid: 70f7b8f0efa62204493d81b8e8b25629, type: 3}
+  soundGameBGM: {fileID: 8300000, guid: 6e1c95b9af24d194e8fd58d031fed792, type: 3}
 --- !u!4 &1583569000
 Transform:
   m_ObjectHideFlags: 0
@@ -2253,8 +2292,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9797b080bcb0288489a6ef886d5b324e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 8300000, guid: dbde4eb0615d0dc4eac4c9c521c6fc8b, type: 3}
 --- !u!82 &2060460407
 AudioSource:
   m_ObjectHideFlags: 0

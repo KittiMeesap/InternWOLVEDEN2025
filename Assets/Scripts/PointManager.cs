@@ -47,7 +47,6 @@ public class PointManager : MonoBehaviour
             if (totalPassivePointsPerSecond > 0)
             {
                 AddPoints(totalPassivePointsPerSecond);
-                Debug.Log($"Added {totalPassivePointsPerSecond} passive points. Total points: {points}");
                 foreach (PassivePointBuilding building in activePassiveBuildings)
                 {
                     if (building != null)

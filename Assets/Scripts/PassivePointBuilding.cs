@@ -32,7 +32,6 @@ public class PassivePointBuilding : BuildIngWithFloatingText
         if (PointManager.instance != null)
         {
             PointManager.instance.RegisterPassiveBuilding(pointsPerInterval, this);
-            Debug.Log($"Passive Building activated and registered: {gameObject.name}. Points: {pointsPerInterval}");
         }
     }
 
