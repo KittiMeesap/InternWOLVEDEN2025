@@ -66,16 +66,9 @@ public class UpgradeItem : MonoBehaviour
                 if (BuildManager.instance.CanInstantiateBuilding())
                 {
                     PointManager.instance.AddPoints(-buildingInfoFromPrefab.buildingCost);
-
                     if (buildingPrefabToBuy != null)
                     {
                         BuildManager.instance.InstantiateBuilding(buildingPrefabToBuy, buildingInfoFromPrefab.buildingCost);
-
-                        if (TutorialManager.instance != null)
-                        {
-                            TutorialManager.instance.NotifyPurchase();
-                        }
-
                         UpdateUI();
                     }
                 }
@@ -117,7 +110,7 @@ public class UpgradeItem : MonoBehaviour
                         effectText.text = $"Click Bonus: +{bonus.BonusPointsPerBuilding} Pts";
                         break;
                     case UnlockBlackGrindBuilding unlocker:
-                        effectText.text = $"Unlocks area";
+                        effectText.text = $"Unlocks area "; 
                         break;
                     default:
                         effectText.text = "No Special Effect";
