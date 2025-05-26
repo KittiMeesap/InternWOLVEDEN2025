@@ -1,3 +1,4 @@
+// ใน UpgradeItem.cs
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,15 +64,13 @@ public class UpgradeItem : MonoBehaviour
         {
             if (PointManager.instance != null && PointManager.instance.points >= buildingInfoFromPrefab.buildingCost)
             {
-                if (BuildManager.instance.CanInstantiateBuilding())
-                {
-                    PointManager.instance.AddPoints(-buildingInfoFromPrefab.buildingCost);
+            
                     if (buildingPrefabToBuy != null)
                     {
                         BuildManager.instance.InstantiateBuilding(buildingPrefabToBuy, buildingInfoFromPrefab.buildingCost);
                         UpdateUI();
                     }
-                }
+                
             }
         }
     }
@@ -111,6 +110,9 @@ public class UpgradeItem : MonoBehaviour
                         break;
                     case UnlockBlackGrindBuilding unlocker:
                         effectText.text = $"Unlocks area "; 
+                        break;
+                    case RemoverBuilding remover: // เพิ่ม case สำหรับ RemoverBuilding
+                        effectText.text = $"Removes building"; //
                         break;
                     default:
                         effectText.text = "No Special Effect";

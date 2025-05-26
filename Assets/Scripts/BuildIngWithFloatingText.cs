@@ -30,13 +30,14 @@ public abstract class BuildIngWithFloatingText : BaseBuilding
         }
     }
     
-    protected IEnumerator FloatAndFadeText(int pointsToShow)
+    // *** เปลี่ยน FloatAndFadeText ให้รับ string แทน int ***
+    protected IEnumerator FloatAndFadeText(string textToShow)
     {
         if (pointsText != null)
         {
             pointsText.color = initialTextColor;
             pointsText.gameObject.SetActive(true);
-            pointsText.text = $"+ {pointsToShow}";
+            pointsText.text = textToShow; // ใช้ textToShow ที่รับเข้ามา
         }
 
         float currentFloatTime = 0f;

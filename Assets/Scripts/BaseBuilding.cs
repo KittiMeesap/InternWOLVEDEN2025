@@ -22,5 +22,6 @@ public abstract class BaseBuilding : MonoBehaviour
         isBuildingActive = false;
         SoundManager.instance?.PlaySound(SoundManager.instance.soundDestroyBuilding);
     }
+    
 
 }
