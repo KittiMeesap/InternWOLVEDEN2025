@@ -340,4 +340,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buildingName: Unlock
-  buildingCost: 100
+  buildingCost: 1

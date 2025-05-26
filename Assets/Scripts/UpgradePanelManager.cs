@@ -25,8 +25,17 @@ public class UpgradePanelManager : MonoBehaviour
     void Start()
     {
         upgradePanel.SetActive(false);
-        upgradeButton.SetActive(true);
+        
+        if (TutorialManager.instance != null && !TutorialManager.instance.IsTutorialStepAllowingShop())
+        {
+            upgradeButton.SetActive(false);
+        }
+        else
+        {
+            upgradeButton.SetActive(true);
+        }
     }
+
 
     public void OpenUpgradePanel()
     {
