@@ -29,6 +29,8 @@ public class BuildManager : MonoBehaviour
     private int currentBuildingCost = 0;
     private GameObject currentBuildingPrefab;
 
+    public bool HasPlacedNewTile { get; private set; } = false;
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -52,16 +54,16 @@ public class BuildManager : MonoBehaviour
             Vector3Int currentCell = groundTilemap.WorldToCell(targetPosition);
             if (!currentBuildingInstance.activeSelf)
             {
-                if (Vector3.Distance(currentBuildingInstance.transform.position, GetTargetPosition()) > 0.1f) 
+                if (Vector3.Distance(currentBuildingInstance.transform.position, GetTargetPosition()) > 0.1f)
                 {
-                    currentBuildingInstance.SetActive(true); 
+                    currentBuildingInstance.SetActive(true);
                 }
             }
             if (currentCell != lastHoveredCell)
             {
                 ClearHighlight();
                 lastHoveredCell = currentCell;
-                HighlightCell(currentCell, IsCellOccupiedOrNoBuildZone(currentCell)); 
+                HighlightCell(currentCell, IsCellOccupiedOrNoBuildZone(currentCell));
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -86,9 +88,9 @@ public class BuildManager : MonoBehaviour
                     {
                         baseBuildingScript.StopBuilding();
                     }
-                    if (currentBuildingInstance.activeSelf) 
+                    if (currentBuildingInstance.activeSelf)
                     {
-                        currentBuildingInstance.SetActive(false); 
+                        currentBuildingInstance.SetActive(false);
                     }
                 }
                 UpgradePanelManager.instance.OpenUpgradePanel();
@@ -100,7 +102,7 @@ public class BuildManager : MonoBehaviour
                 currentBuildingPrefab = null;
             }
         }
-        else 
+        else
         {
             if (lastHoveredCell != Vector3Int.one * -1)
             {
@@ -126,15 +128,14 @@ public class BuildManager : MonoBehaviour
         {
             currentBuildingPrefab = prefabToInstantiate;
             currentBuildingCost = costOfBuilding;
-            
-            currentBuildingInstance = Instantiate(currentBuildingPrefab);
-            currentBuildingInstance.SetActive(false); 
-            currentBuildingInstance.transform.position = Vector3.zero; 
-          
 
-            UpgradePanelManager.instance.CloseUpgradePanel();
+            currentBuildingInstance = Instantiate(currentBuildingPrefab);
+            currentBuildingInstance.SetActive(false);
+            currentBuildingInstance.transform.position = Vector3.zero;
+
+            //UpgradePanelManager.instance.CloseUpgradePanel();
             backTilemap.SetActive(true);
-            
+
             lastHoveredCell = Vector3Int.one * -1;
             ClearAllHighlights();
         }
@@ -159,9 +160,9 @@ public class BuildManager : MonoBehaviour
 
         if (!IsCellOccupiedOrNoBuildZone(cellToPlace))
         {
-            if (!currentBuildingInstance.activeSelf) 
+            if (!currentBuildingInstance.activeSelf)
             {
-                currentBuildingInstance.SetActive(true); 
+                currentBuildingInstance.SetActive(true);
             }
             currentBuildingInstance.transform.position = position;
 
@@ -173,47 +174,47 @@ public class BuildManager : MonoBehaviour
                 UnlockBlackGrindBuilding unlockBuilding = baseBuildingScript as UnlockBlackGrindBuilding;
                 if (unlockBuilding != null)
                 {
+                    HasPlacedNewTile = true;
                     occupiedCells.Remove(cellToPlace);
                     if (currentBuildingInstance.activeSelf)
                     {
-                        currentBuildingInstance.SetActive(false); 
+                        currentBuildingInstance.SetActive(false);
                     }
                     Destroy(currentBuildingInstance);
-                    currentBuildingInstance = null; 
+                    currentBuildingInstance = null;
                     lastHoveredCell = Vector3Int.one * -1;
                     ClearAllHighlights();
                 }
                 else
                 {
                     occupiedCells.Add(cellToPlace);
-                    currentBuildingInstance = null; 
+                    currentBuildingInstance = null;
                     lastHoveredCell = Vector3Int.one * -1;
                     ClearAllHighlights();
                 }
             }
-            else 
+            else
             {
                 occupiedCells.Add(cellToPlace);
                 currentBuildingInstance = null;
                 lastHoveredCell = Vector3Int.one * -1;
                 ClearAllHighlights();
             }
-            
+
             if (PointManager.instance != null && currentBuildingPrefab != null && PointManager.instance.points >= currentBuildingCost)
             {
-                 currentBuildingInstance = Instantiate(currentBuildingPrefab);
-                 currentBuildingInstance.SetActive(false); 
-                 currentBuildingInstance.transform.position = Vector3.zero;
-               
+                currentBuildingInstance = Instantiate(currentBuildingPrefab);
+                currentBuildingInstance.SetActive(false);
+                currentBuildingInstance.transform.position = Vector3.zero;
             }
             else
             {
-                 UpgradePanelManager.instance.OpenUpgradePanel();
-                 backTilemap.SetActive(false);
-                 currentBuildingPrefab = null; 
+                //UpgradePanelManager.instance.OpenUpgradePanel();
+                backTilemap.SetActive(false);
+                currentBuildingPrefab = null;
             }
         }
-        else // ถ้าวางไม่ได้
+        else
         {
             if (PointManager.instance != null && currentBuildingCost > 0)
             {
@@ -225,14 +226,14 @@ public class BuildManager : MonoBehaviour
                 BaseBuilding baseBuildingScript = currentBuildingInstance.GetComponent<BaseBuilding>();
                 if (baseBuildingScript != null)
                 {
-                    baseBuildingScript.StopBuilding(); 
+                    baseBuildingScript.StopBuilding();
                 }
-                if (currentBuildingInstance.activeSelf) 
+                if (currentBuildingInstance.activeSelf)
                 {
                     currentBuildingInstance.SetActive(false);
                 }
             }
-            UpgradePanelManager.instance.OpenUpgradePanel();
+            //UpgradePanelManager.instance.OpenUpgradePanel();
             backTilemap.SetActive(false);
             Destroy(currentBuildingInstance);
             currentBuildingInstance = null;
@@ -259,23 +260,12 @@ public class BuildManager : MonoBehaviour
         {
             if (!unlockedCells.Contains(cell))
             {
-                if (isCurrentBuildingUnlocker)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                return !isCurrentBuildingUnlocker;
             }
         }
         if (tileAtGroundMap != null)
         {
-            if (tileAtGroundMap == noBuildZoneTile)
-            {
-                return true;
-            }
-            if (tileAtGroundMap == clickablePointTile)
+            if (tileAtGroundMap == noBuildZoneTile || tileAtGroundMap == clickablePointTile)
             {
                 return true;
             }
@@ -298,16 +288,8 @@ public class BuildManager : MonoBehaviour
                 TileBase tileAtGroundMapForHighlight = groundTilemap?.GetTile(cell);
                 if (tileAtGroundMapForHighlight != null && tileAtGroundMapForHighlight == blackGrindTilebase && !unlockedCells.Contains(cell))
                 {
-                    if (!isCurrentBuildingUnlocker)
-                    {
-                        highlightTilemap.SetTile(cell, cannotPlaceTile);
-                        return;
-                    }
-                    else
-                    {
-                        highlightTilemap.SetTile(cell, canPlaceTile);
-                        return;
-                    }
+                    highlightTilemap.SetTile(cell, isCurrentBuildingUnlocker ? canPlaceTile : cannotPlaceTile);
+                    return;
                 }
             }
             highlightTilemap.SetTile(cell, isOccupied ? cannotPlaceTile : canPlaceTile);
@@ -324,10 +306,7 @@ public class BuildManager : MonoBehaviour
 
     private void ClearAllHighlights()
     {
-        if (highlightTilemap != null)
-        {
-            highlightTilemap.ClearAllTiles();
-        }
+        highlightTilemap?.ClearAllTiles();
     }
 
     private void CheckForClickableTileWithRaycast()
@@ -344,20 +323,11 @@ public class BuildManager : MonoBehaviour
 
                 if (tileAtClickedCell != null && tileAtClickedCell == clickablePointTile)
                 {
-                    if (PointManager.instance != null)
-                    {
-                        PointManager.instance.AddPointsForTileClick();
-                        
-                        if (FloatingTextPool.instance != null)
-                        {
-                            FloatingTextPool.instance.ShowFloatingText(hit.point, $"+ {PointManager.instance.currentPointsPerClickOnTile}");
-                        }
+                    PointManager.instance?.AddPointsForTileClick();
+                    FloatingTextPool.instance?.ShowFloatingText(hit.point, $"+{PointManager.instance.currentPointsPerClickOnTile}");
+                    SoundManager.instance?.PlaySound(SoundManager.instance.soundTileClickPoint);
 
-                        if (SoundManager.instance != null && SoundManager.instance.soundTileClickPoint != null)
-                        {
-                            SoundManager.instance.PlaySound(SoundManager.instance.soundTileClickPoint);
-                        }
-                    }
+                    TutorialManager.instance?.OnIslandClicked();
                 }
             }
         }
@@ -373,8 +343,6 @@ public class BuildManager : MonoBehaviour
                 groundTilemap.SetTile(cell, null);
                 unlockedCells.Add(cell);
             }
-           
         }
     }
-    
 }
